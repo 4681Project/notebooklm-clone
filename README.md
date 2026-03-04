@@ -33,11 +33,28 @@ notebooklm-clone/
 │   └── artifacts.py        ← Report / Quiz / Podcast generation + TTS
 ├── .github/workflows/
 │   └── ci.yml              ← Lint + test on push/PR
+├── data/                   ← Auto-created at runtime by storage.py
+│   └── users/
+│       └── <username>/
+│           └── notebooks/
+│               ├── index.json               ← list of all notebooks
+│               └── <notebook-uuid>/
+│                   ├── files_raw/           ← original uploads
+│                   ├── files_extracted/     ← plain text extractions
+│                   ├── chroma/              ← ChromaDB vector store
+│                   ├── chat/
+│                   │   └── messages.jsonl   ← persistent chat history
+│                   └── artifacts/
+│                       ├── reports/         ← report_1.md ...
+│                       ├── quizzes/         ← quiz_1.md ...
+│                       └── podcasts/        ← podcast_1.md, podcast_1.mp3 ...
 ├── .env.example
 ├── requirements.txt
 ├── README.md
 └── ARCHITECTURE.md
 ```
+
+> **Note:** The `data/` folder and all subdirectories are created automatically by `storage.py` when the app first runs. You do not need to create anything manually.
 
 ---
 

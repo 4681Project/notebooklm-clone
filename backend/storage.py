@@ -26,12 +26,11 @@ from pathlib import Path
 from typing import Optional
 
 # Root data directory — writable on HF Spaces
-DATA_ROOT = Path(os.getenv("DATA_ROOT", "/data"))
+DATA_ROOT = Path(os.getenv("DATA_ROOT", "./data"))
+DATA_ROOT.mkdir(parents=True, exist_ok=True)  # ensure root exists on startup
 
 
-# ---------------------------------------------------------------------------
 # Path helpers
-# ---------------------------------------------------------------------------
 
 def _user_root(username: str) -> Path:
     return DATA_ROOT / "users" / username / "notebooks"
@@ -45,9 +44,7 @@ def _nb_index_path(username: str) -> Path:
     return _user_root(username) / "index.json"
 
 
-# ---------------------------------------------------------------------------
 # Notebook index helpers
-# ---------------------------------------------------------------------------
 
 def _load_index(username: str) -> list[dict]:
     path = _nb_index_path(username)
@@ -64,9 +61,7 @@ def _save_index(username: str, index: list[dict]) -> None:
         json.dump(index, f, indent=2)
 
 
-# ---------------------------------------------------------------------------
 # Public API
-# ---------------------------------------------------------------------------
 
 def list_notebooks(username: str) -> list[dict]:
     """Return list of notebook metadata dicts for a user."""
@@ -131,9 +126,7 @@ def get_notebook(username: str, notebook_id: str) -> Optional[dict]:
     return None
 
 
-# ---------------------------------------------------------------------------
 # File helpers
-# ---------------------------------------------------------------------------
 
 def save_raw_file(username: str, notebook_id: str, filename: str, data: bytes) -> Path:
     dest = _nb_root(username, notebook_id) / "files_raw" / filename
@@ -167,9 +160,7 @@ def get_chroma_path(username: str, notebook_id: str) -> str:
     return str(_nb_root(username, notebook_id) / "chroma")
 
 
-# ---------------------------------------------------------------------------
 # Chat persistence
-# ---------------------------------------------------------------------------
 
 def _chat_path(username: str, notebook_id: str) -> Path:
     return _nb_root(username, notebook_id) / "chat" / "messages.jsonl"
@@ -207,9 +198,7 @@ def clear_chat(username: str, notebook_id: str) -> None:
         path.unlink()
 
 
-# ---------------------------------------------------------------------------
 # Artifact helpers
-# ---------------------------------------------------------------------------
 
 def _artifact_dir(username: str, notebook_id: str, kind: str) -> Path:
     return _nb_root(username, notebook_id) / "artifacts" / kind
@@ -237,9 +226,7 @@ def list_artifacts(username: str, notebook_id: str, kind: str) -> list[Path]:
     return sorted(art_dir.iterdir())
 
 
-# ---------------------------------------------------------------------------
 # Internal
-# ---------------------------------------------------------------------------
 
 def _touch_notebook(username: str, notebook_id: str) -> None:
     index = _load_index(username)
