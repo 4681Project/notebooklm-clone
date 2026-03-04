@@ -1,174 +1,108 @@
-# NotebookLM Clone
+# 📓 NotebookLM Clone
 
-A full-stack AI-powered research assistant that lets users upload documents, chat with them using Retrieval-Augmented Generation (RAG), and generate study artifacts like reports, quizzes, and podcasts.
-
----
-
-## Demo
-
-> _Add a screenshot or GIF of your app here once it's running_
+A full-stack AI research assistant inspired by Google's NotebookLM. Upload documents, chat using RAG with citations, and generate study artifacts (reports, quizzes, podcasts).
 
 ---
 
-## Features
+## ✨ Features
 
-- **Multi-notebook support** — create, switch between, and manage multiple notebooks
-- **Source ingestion** — upload PDF, PPTX, and TXT files, or paste any web URL
-- **RAG Chat** — ask questions about your sources and get cited, grounded answers
-- **Artifact generation**
-  - Report — a comprehensive markdown study guide
-  - Quiz — multiple choice questions with an answer key
-  - Podcast — a two-host conversation script with audio playback
-- **Persistent storage** — notebooks, chats, and artifacts are saved across sessions
-
----
-
-## Tech Stack
-
-| Layer | Technology |
+| Feature | Detail |
 |---|---|
-| Frontend | [Gradio](https://gradio.app) |
-| LLM | [OpenAI GPT-4o](https://platform.openai.com) |
-| Vector DB | [ChromaDB](https://trychroma.com) |
-| PDF parsing | PyPDF2 |
-| PPTX parsing | python-pptx |
-| Web scraping | BeautifulSoup4 + requests |
-| Text to Speech | OpenAI TTS |
+| **Auth** | Username/password login — per-user data isolation |
+| **Notebooks** | Create / rename / delete multiple notebooks per user |
+| **Ingestion** | PDF, PPTX, TXT, Markdown, Web URLs |
+| **RAG Chat** | 4 retrieval techniques with inline citations |
+| **Report** | AI-generated Markdown research report |
+| **Quiz** | 10-question multiple-choice quiz + answer key |
+| **Podcast** | Transcript + MP3 audio (single or two-host) |
+| **Persistence** | Chat history and artifacts survive across sessions |
+| **CI** | GitHub Actions — lint + test on every push/PR |
 
 ---
 
-## Project Structure
+## 🏗️ Architecture
 
 ```
 notebooklm-clone/
-├── app.py                  # Gradio UI and event wiring
+├── app.py                  ← Gradio UI + all callbacks (entry point)
 ├── backend/
-│   ├── ingest.py           # File & URL ingestion, chunking, embedding
-│   ├── retrieval.py        # ChromaDB vector search
-│   ├── chat.py             # RAG chat with source citations
-│   └── artifacts.py        # Report, quiz, and podcast generation
-├── data/                   # Runtime user data (gitignored)
-│   └── users/
-│       └── <username>/
-│           └── notebooks/
-│               └── <notebook-id>/
-│                   ├── files_raw/
-│                   ├── files_extracted/
-│                   ├── chroma/
-│                   ├── chat/messages.jsonl
-│                   └── artifacts/
-├── requirements.txt
+│   ├── storage.py          ← Per-user/per-notebook file & metadata management
+│   ├── ingestion.py        ← Text extraction + chunking + ChromaDB upsert
+│   ├── retrieval.py        ← 4 RAG retrieval techniques
+│   ├── chat.py             ← RAG chat with citation parsing + history
+│   └── artifacts.py        ← Report / Quiz / Podcast generation + TTS
+├── .github/workflows/
+│   └── ci.yml              ← Lint + test on push/PR
 ├── .env.example
-└── README.md
+├── requirements.txt
+├── README.md
+└── ARCHITECTURE.md
 ```
 
 ---
 
-## Setup
+## ⚙️ Setup
 
-### Prerequisites
-
-- Python 3.10+
-- An OpenAI API key — get one at [platform.openai.com](https://platform.openai.com)
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/4681Project/notebooklm-clone
-   cd notebooklm-clone
-   ```
-
-2. **Create and activate a virtual environment**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate        # Mac/Linux
-   venv\Scripts\activate           # Windows
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Set up environment variables**
-   ```bash
-   cp .env.example .env
-   ```
-   Open `.env` and add your API key:
-   ```
-   OPENAI_API_KEY=sk-...
-   ```
-
-5. **Run the app**
-   ```bash
-   python app.py
-   ```
-   The app will be available at `http://localhost:7860`
-
----
-
-## Environment Variables
-
-| Variable | Required | Description |
-|---|---|---|
-| `OPENAI_API_KEY` | Yes | Your OpenAI API key for LLM and TTS calls |
-
----
-
-## Team & Module Ownership
-
-| Person | Module | File |
-|---|---|---|
-| Person 1 | Gradio UI | `app.py` |
-| Person 2 | Ingestion pipeline | `backend/ingest.py` |
-| Person 3 | RAG + ChromaDB | `backend/retrieval.py` |
-| Person 4 | Chat + citations | `backend/chat.py` |
-| Person 5 | Artifact generation | `backend/artifacts.py` |
-
----
-
-## Contributing
-
-We use a feature-branch workflow. Please do **not** push directly to `main`.
+### 1. Clone & install
 
 ```bash
-# 1. Pull the latest main
-git checkout main
-git pull origin main
+git clone https://github.com/<your-org>/<your-repo>
+cd notebooklm-clone
+pip install -r requirements.txt
+```
 
-# 2. Create a feature branch
-git checkout -b feature/your-feature-name
+### 2. Configure environment
 
-# 3. Make your changes, then commit
-git add .
-git commit -m "Short description of what you changed"
+```bash
+cp .env.example .env
+# Edit .env — set OPENAI_API_KEY and USERS
+```
 
-# 4. Push your branch
-git push origin feature/your-feature-name
+### 3. Run
 
-# 5. Open a Pull Request on GitHub and request a review
+```bash
+python app.py
+# Open http://localhost:7860
 ```
 
 ---
 
-## Architecture Overview
+## 🔐 Authentication
+
+Users are defined via the `USERS` environment variable:
 
 ```
-User
- │
- ▼
-Gradio UI (app.py)
- │
- ├──► Ingest ──► Extract text ──► Chunk ──► Embed ──► ChromaDB
- │
- ├──► Chat ──► Retrieve top-k chunks ──► Prompt LLM ──► Response + citations
- │
- └──► Artifacts ──► Retrieve chunks ──► Prompt LLM ──► Report / Quiz / Podcast
+USERS="alice:password1,bob:password2"
 ```
+
+Each user gets a completely isolated data directory. Add this to your `.env` (local) or as a repository secret (GitHub Actions / any deployment).
 
 ---
 
-## License
+## 🔧 Environment Variables
 
-MIT
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `OPENAI_API_KEY` | ✅ | — | OpenAI API key |
+| `USERS` | ✅ | `admin:changeme` | Comma-separated `user:pass` pairs |
+| `LLM_MODEL` | | `gpt-4o-mini` | Chat/artifact model |
+| `EMBED_MODEL` | | `text-embedding-3-small` | Embedding model |
+| `TTS_MODEL` | | `tts-1` | Text-to-speech model |
+| `CHUNK_SIZE` | | `800` | Characters per chunk |
+| `CHUNK_OVERLAP` | | `150` | Overlap between chunks |
+| `TOP_K` | | `5` | Chunks retrieved per query |
+| `DATA_ROOT` | | `./data` | Root directory for all user data |
+| `PORT` | | `7860` | Server port |
+
+---
+
+## 📊 RAG Techniques
+
+See `ARCHITECTURE.md` for the full analysis.
+
+| Technique | Speed | Best For |
+|---|---|---|
+| **Naive** | ⚡⚡⚡ | Quick factual lookups |
+| **MMR** | ⚡⚡ | Broad summaries (diverse chunks) |
+| **HyDE** | ⚡ | Abstract/indirect questions |
+| **Rerank** | 🐢 | Complex, high-stakes queries |
