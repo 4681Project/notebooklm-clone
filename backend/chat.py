@@ -9,16 +9,10 @@ client = OpenAI()  # reads OPENAI_API_KEY from environment automatically
 
 def format_history_for_openai(history: list) -> list:
     """
-    Convert Gradio chat history [[user, assistant], ...] 
+    Convert Gradio chat history (list of {role, content} dicts)
     into OpenAI message format.
     """
-    messages = []
-    for pair in history:
-        if pair[0]:
-            messages.append({"role": "user", "content": pair[0]})
-        if pair[1]:
-            messages.append({"role": "assistant", "content": pair[1]})
-    return messages
+    return [{"role": msg["role"], "content": msg["content"]} for msg in history if msg.get("content")]
 
 
 def chat_with_sources(message: str, nb_id: str, username: str, history: list) -> str:

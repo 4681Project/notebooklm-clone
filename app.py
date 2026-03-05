@@ -59,12 +59,8 @@ def switch_notebook(name: str, profile: gr.OAuthProfile | None):
     for nb in notebooks:
         if nb["name"] == name:
             history = load_chat_history(username, nb["id"])
-            pairs = []
-            for i in range(0, len(history) - 1, 2):
-                user_msg = history[i]["content"]
-                asst_msg = history[i + 1]["content"] if i + 1 < len(history) else ""
-                pairs.append([user_msg, asst_msg])
-            return nb["id"], f"Switched to: {name}", pairs
+            messages = [{"role": msg["role"], "content": msg["content"]} for msg in history]
+            return nb["id"], f"Switched to: {name}", messages
     return None, "Notebook not found.", []
 
 
@@ -97,11 +93,12 @@ def handle_url_ingest(url: str, nb_id: str, profile: gr.OAuthProfile | None):
 def handle_chat(message: str, history: list, nb_id: str, profile: gr.OAuthProfile | None):
     username = get_username(profile)
     if not nb_id:
-        return history + [[message, "Please create or select a notebook first."]], ""
+        return history + [{"role": "user", "content": message}, {"role": "assistant", "content": "Please create or select a notebook first."}], ""
     response = chat_with_sources(message, nb_id, username, history)
     save_message(username, nb_id, "user", message)
     save_message(username, nb_id, "assistant", response)
-    history.append([message, response])
+    history.append({"role": "user", "content": message})
+    history.append({"role": "assistant", "content": response})
     return history, ""
 
 
@@ -169,7 +166,7 @@ with gr.Blocks(title="NotebookLM Clone") as demo:
         with gr.Column(scale=3):
             with gr.Tabs():
                 with gr.Tab("Chat"):
-                    chatbot = gr.Chatbot(label="Chat with your sources", height=400)
+                    chatbot = gr.Chatbot(label="Chat with your sources", height=400, type="messages")
                     chat_input = gr.Textbox(label="Ask a question...")
                     chat_btn = gr.Button("Send")
 
