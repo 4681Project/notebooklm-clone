@@ -14,7 +14,7 @@ hf_oauth: true
 
 ## Demo
 
-> _Add a screenshot or GIF of your app here once it's running_
+![NotebookLM Clone Screenshot](assets/screenshot.png)
 
 ---
 
