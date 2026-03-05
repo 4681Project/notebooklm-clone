@@ -1,8 +1,17 @@
 import os
+import gradio as gr
 from dotenv import load_dotenv
+
+# Load .env locally; on HF Spaces the secrets are injected automatically
 load_dotenv()
 
-import gradio as gr
+# Verify the OpenAI key is present at startup so errors are obvious
+if not os.getenv("OPENAI_API_KEY"):
+    raise EnvironmentError(
+        "OPENAI_API_KEY is not set. "
+        "Add it to your .env file locally, or to Space Secrets on Hugging Face."
+    )
+
 from backend.ingest import ingest_file, ingest_url
 from backend.chat import chat_with_sources
 from backend.artifacts import generate_report, generate_quiz, generate_podcast
@@ -13,7 +22,9 @@ from backend.storage import (
     save_message,
 )
 
+# ---------------------------------------------------------------------------
 # Helpers — all data is now keyed by HF username
+# ---------------------------------------------------------------------------
 
 def get_username(profile: gr.OAuthProfile | None) -> str:
     """Return HF username, or 'guest' if not logged in."""
@@ -22,7 +33,9 @@ def get_username(profile: gr.OAuthProfile | None) -> str:
     return profile.username
 
 
+# ---------------------------------------------------------------------------
 # Notebook actions
+# ---------------------------------------------------------------------------
 
 def create_notebook(name: str, profile: gr.OAuthProfile | None):
     username = get_username(profile)
@@ -46,7 +59,6 @@ def switch_notebook(name: str, profile: gr.OAuthProfile | None):
     for nb in notebooks:
         if nb["name"] == name:
             history = load_chat_history(username, nb["id"])
-            # Convert stored messages to Gradio chatbot format [[user, assistant], ...]
             pairs = []
             for i in range(0, len(history) - 1, 2):
                 user_msg = history[i]["content"]
@@ -55,7 +67,10 @@ def switch_notebook(name: str, profile: gr.OAuthProfile | None):
             return nb["id"], f"Switched to: {name}", pairs
     return None, "Notebook not found.", []
 
+
+# ---------------------------------------------------------------------------
 # Ingestion
+# ---------------------------------------------------------------------------
 
 def handle_file_upload(files, nb_id: str, profile: gr.OAuthProfile | None):
     username = get_username(profile)
@@ -75,7 +90,9 @@ def handle_url_ingest(url: str, nb_id: str, profile: gr.OAuthProfile | None):
     return ingest_url(url, nb_id, username)
 
 
+# ---------------------------------------------------------------------------
 # Chat
+# ---------------------------------------------------------------------------
 
 def handle_chat(message: str, history: list, nb_id: str, profile: gr.OAuthProfile | None):
     username = get_username(profile)
@@ -88,7 +105,9 @@ def handle_chat(message: str, history: list, nb_id: str, profile: gr.OAuthProfil
     return history, ""
 
 
+# ---------------------------------------------------------------------------
 # Artifacts
+# ---------------------------------------------------------------------------
 
 def handle_generate_report(nb_id: str, profile: gr.OAuthProfile | None):
     username = get_username(profile)
@@ -111,7 +130,9 @@ def handle_generate_podcast(nb_id: str, profile: gr.OAuthProfile | None):
     return generate_podcast(nb_id, username)
 
 
+# ---------------------------------------------------------------------------
 # Gradio UI
+# ---------------------------------------------------------------------------
 
 with gr.Blocks(title="NotebookLM Clone") as demo:
     # Stores the currently selected notebook ID in browser state

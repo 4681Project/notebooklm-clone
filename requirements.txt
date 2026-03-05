@@ -1,5 +1,5 @@
 # UI
-gradio[oauth]>=4.0.0
+gradio[oauth]==6.8.0
 
 # LLM + Embeddings
 openai>=1.0.0
