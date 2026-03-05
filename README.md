@@ -12,12 +12,6 @@ hf_oauth: true
 
 ---
 
-## Demo
-
-![NotebookLM Clone Screenshot](assets/screenshot.png)
-
----
-
 ## Features
 
 - **Multi-notebook support** — create, switch between, and manage multiple notebooks
@@ -174,6 +168,16 @@ Gradio UI (app.py)
  │
  └──► Artifacts ──► Retrieve chunks ──► Prompt LLM ──► Report / Quiz / Podcast
 ```
+
+---
+---
+
+## Demo
+
+![NotebookLM Clone Screenshot](assets/screenshot.png)
+![NotebookLM Clone Screenshot](assets/screenshot1.png)
+![NotebookLM Clone Screenshot](assets/screenshot2.png)
+![NotebookLM Clone Screenshot](assets/screenshot3.png)
 
 ---
 
