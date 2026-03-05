@@ -166,7 +166,7 @@ with gr.Blocks(title="NotebookLM Clone") as demo:
         with gr.Column(scale=3):
             with gr.Tabs():
                 with gr.Tab("Chat"):
-                    chatbot = gr.Chatbot(label="Chat with your sources", height=400, type="messages")
+                    chatbot = gr.Chatbot(label="Chat with your sources", height=400)
                     chat_input = gr.Textbox(label="Ask a question...")
                     chat_btn = gr.Button("Send")
 
