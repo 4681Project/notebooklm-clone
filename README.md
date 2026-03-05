@@ -1,6 +1,13 @@
-# NotebookLM Clone
-
-A full-stack AI-powered research assistant that lets users upload documents, chat with them using Retrieval-Augmented Generation (RAG), and generate study artifacts like reports, quizzes, and podcasts.
+---
+title: NotebookLM Clone
+emoji: 📓
+colorFrom: blue
+colorTo: purple
+sdk: gradio
+sdk_version: "4.0.0"
+app_file: app.py
+pinned: false
+---
 
 ---
 
